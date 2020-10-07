@@ -390,6 +390,8 @@ func (c *Cluster) getValidQueryBackend() *backend.DbBackend {
 }
 
 func (c *Cluster) handleQueryHA(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	defer c.log.Debug().Msgf("handler ha QUERY TIME CONSUMING:%s", time.Since(start).String())
 	relayctx.AppendCxtTracePath(r, "handleQueryHA", c.cfg.Name)
 
 	if r.Method != http.MethodPost && r.Method != http.MethodGet && r.Method != http.MethodHead {
@@ -402,11 +404,15 @@ func (c *Cluster) handleQueryHA(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	startBd := time.Now()
 	b := c.getValidQueryBackend()
+	defer c.log.Debug().Msgf("getValidQueryBackend TIME CONSUMING:%s", time.Since(startBd).String())
 	c.handleQuery(w, r, b)
 }
 
 func (c *Cluster) handleQuerySingle(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	defer c.log.Debug().Msgf("handler single QUERY TIME CONSUMING:%s", time.Since(start).String())
 	relayctx.AppendCxtTracePath(r, "handleQuerySingle", c.cfg.Name)
 	if r.Method != http.MethodPost && r.Method != http.MethodGet && r.Method != http.MethodHead {
 		//w.Header().Set("Allow", http.MethodPost)
@@ -422,6 +428,8 @@ func (c *Cluster) handleQuerySingle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cluster) handleQuery(w http.ResponseWriter, r *http.Request, b *backend.DbBackend) {
+	start := time.Now()
+	defer c.log.Debug().Msgf("handler QUERY TIME CONSUMING:%s", time.Since(start).String())
 	relayctx.AppendCxtTracePath(r, "Backend", b.Name())
 	queryParams := r.URL.Query()
 	c.log.Debug().Msgf("QUERY PARAMS: %+v	", queryParams)
@@ -434,6 +442,7 @@ func (c *Cluster) handleQuery(w http.ResponseWriter, r *http.Request, b *backend
 		c.log.Error().Msgf("Problem posting to cluster %s backend %s: %s", c.cfg.Name, b.Name(), err)
 		return
 	}
+	c.log.Debug().Msgf("QUERY TIME CONSUMING:%s", time.Since(start).String())
 
 	for name, values := range resp.Header {
 		w.Header()[name] = values
