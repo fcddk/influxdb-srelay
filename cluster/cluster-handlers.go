@@ -18,7 +18,8 @@ import (
 func (c *Cluster) HandlePing(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet || r.Method == http.MethodHead {
 		//TODO do a real ping over all cluster members
-		utils.AddInfluxPingHeaders(w, "Influx-Smart-Relay")
+		influxDbVersion := utils.GetInfluxPingVersion()
+		utils.AddInfluxPingHeaders(w, influxDbVersion)
 		w.WriteHeader(c.pingResponseCode)
 	} else {
 		relayctx.JsonResponse(w, r, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"encoding/base64"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type LogFile struct {
@@ -148,4 +150,38 @@ func AddInfluxPingHeaders(w http.ResponseWriter, version string) {
 	w.Header().Add("X-InfluxDB-Version", version)
 	w.Header().Add("X-Influx-SRelay-Version", relayVersion)
 	w.Header().Add("Content-Length", "0")
+}
+
+func getInfluxPingHeaderInfo() string {
+	clientNew := &http.Client{
+		Timeout: time.Second * 5,
+	}
+
+	rep, err := http.NewRequest("GET", "http://127.0.0.1:8086", nil)
+	if err != nil {
+		log.Error().Msgf("new http post request error: %s", err.Error())
+		return ""
+	}
+	getResp, err := clientNew.Do(rep.WithContext(context.TODO()))
+	if err != nil {
+		log.Error().Msgf("new http post request error: %s", err.Error())
+		return ""
+	}
+
+	defer getResp.Body.Close()
+
+	if getResp.StatusCode == http.StatusOK {
+		log.Info().Msgf("influx version: %s", getResp.Header.Get("X-Influxdb-Version"))
+		return getResp.Header.Get("X-Influxdb-Version")
+	} else {
+		return ""
+	}
+}
+
+func GetInfluxPingVersion() string {
+	version := getInfluxPingHeaderInfo()
+	//if version == "" {
+	//	version = "1.8.3"
+	//}
+	return version
 }
