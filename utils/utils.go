@@ -179,9 +179,13 @@ func getInfluxPingHeaderInfo() string {
 }
 
 func GetInfluxPingVersion() string {
-	version := getInfluxPingHeaderInfo()
-	//if version == "" {
-	//	version = "1.8.3"
-	//}
+	version := os.Getenv("INFLUXDB_VERSION")
+	if version != "" {
+		return version
+	}
+	version = getInfluxPingHeaderInfo()
+	if version == "" {
+		version = "relay"
+	}
 	return version
 }
