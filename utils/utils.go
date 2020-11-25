@@ -170,7 +170,7 @@ func getInfluxPingHeaderInfo() string {
 
 	defer getResp.Body.Close()
 
-	if getResp.StatusCode == http.StatusOK {
+	if getResp.StatusCode == http.StatusOK || getResp.StatusCode == http.StatusNoContent {
 		log.Info().Msgf("influx version: %s", getResp.Header.Get("X-Influxdb-Version"))
 		return getResp.Header.Get("X-Influxdb-Version")
 	} else {
