@@ -174,6 +174,7 @@ func getInfluxPingHeaderInfo() string {
 		log.Info().Msgf("influx version: %s", getResp.Header.Get("X-Influxdb-Version"))
 		return getResp.Header.Get("X-Influxdb-Version")
 	} else {
+		log.Error().Msgf("http status: %s", getResp.Status)
 		return ""
 	}
 }
