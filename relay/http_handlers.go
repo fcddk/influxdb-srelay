@@ -14,7 +14,9 @@ func (h *HTTP) handlePing(w http.ResponseWriter, r *http.Request) {
 		h.log.Info().Msgf("Handle Health for the hole process....")
 		//health for the hole process
 		relayctx.SetBackendTime(r)
-		utils.AddInfluxPingHeaders(w, "Influx-Smart-Relay")
+
+		influxDbVersion := utils.GetInfluxPingVersion()
+		utils.AddInfluxPingHeaders(w, influxDbVersion)
 		relayctx.VoidResponse(w, r, 204)
 		return
 	}
