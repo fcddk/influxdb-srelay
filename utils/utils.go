@@ -157,7 +157,7 @@ func getInfluxPingHeaderInfo() string {
 		Timeout: time.Second * 5,
 	}
 
-	rep, err := http.NewRequest("GET", "http://127.0.0.1:8086", nil)
+	rep, err := http.NewRequest("GET", "http://127.0.0.1:8086/ping", nil)
 	if err != nil {
 		log.Error().Msgf("new http post request error: %s", err.Error())
 		return ""
