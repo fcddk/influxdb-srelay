@@ -159,12 +159,12 @@ func getInfluxPingHeaderInfo() string {
 
 	rep, err := http.NewRequest("GET", "http://127.0.0.1:8086/ping", nil)
 	if err != nil {
-		log.Error().Msgf("new http post request error: %s", err.Error())
+		log.Error().Msgf("new http request error: %s", err.Error())
 		return ""
 	}
 	getResp, err := clientNew.Do(rep.WithContext(context.TODO()))
 	if err != nil {
-		log.Error().Msgf("new http post request error: %s", err.Error())
+		log.Error().Msgf("do http request error: %s", err.Error())
 		return ""
 	}
 
@@ -174,7 +174,7 @@ func getInfluxPingHeaderInfo() string {
 		log.Info().Msgf("influx version: %s", getResp.Header.Get("X-Influxdb-Version"))
 		return getResp.Header.Get("X-Influxdb-Version")
 	} else {
-		log.Error().Msgf("http status: %s", getResp.Status)
+		log.Warn().Msgf("get influxdb version response http status: %s", getResp.Status)
 		return ""
 	}
 }
